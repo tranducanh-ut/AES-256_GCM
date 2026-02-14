@@ -22,12 +22,12 @@
 
 module aes_encr(
  input wire rst,
-    input  [127:0] in,    // AES luôn xử lý khối 128-bit
-    input  [255:0] key,   // Khóa 256-bit cho AES-256
-    output [127:0] out    // Đầu ra 128-bit
+    input  [127:0] in,    
+    input  [255:0] key,   
+    output [127:0] out    
 );
 
-    // 1) Sinh round keys (AES-256 cần 15 keys x 128-bit = 1920 bits)
+    //   15 keys x 128-bit = 1920 bits
     wire [1919:0] roundKeys;
 
     keyexpan ke (
@@ -35,17 +35,17 @@ module aes_encr(
         .roundKeys(roundKeys)
     );
 
-    // 2) State qua các round (0 đến 14)
+   
     wire [127:0] state [0:14];
 
-    // 3) Initial AddRoundKey (Round 0)
+    
     addroundkey ark0 (
         .data(in),
-        .key (roundKeys[1919 -: 128]), // Lấy 128-bit đầu tiên (K0)
+        .key (roundKeys[1919 -: 128]), // Lấy 128-bit đầu tiên 
         .out (state[0])
     );
 
-    // 4) Round 1 -> 13 (Vòng lặp có MixColumns)
+  
     genvar i;
     generate
         for (i = 1; i < 14; i = i + 1) begin : ROUND_LOOP
@@ -57,7 +57,7 @@ module aes_encr(
         end
     endgenerate
 
-    // 5) Final Round (Vòng 14: NO MixColumns)
+   // vongf14 ko có mixcol
     wire [127:0] sb_out;
     wire [127:0] sr_out;
 
@@ -77,6 +77,6 @@ module aes_encr(
         .out (state[14])
     );
 
-    // 6) Output
+   
     assign out = state[14];
 endmodule

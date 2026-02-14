@@ -21,16 +21,16 @@
 
 
 module keyexpan(
-input  [255:0] key,         // Khóa gốc AES-256
+input  [255:0] key,       
     output [1919:0] roundKeys   // 15 round keys x 128 bit = 1920 bit
 );
 
-    reg [31:0] w [0:59];        // 60 word (32-bit)
+    reg [31:0] w [0:59];        // 60 word 
     integer i;
     reg [31:0] temp;
 
     always @(*) begin
-        // 1) Nạp 8 word đầu tiên trực tiếp từ khóa gốc 256-bit
+        
         w[0] = key[255:224];
         w[1] = key[223:192];
         w[2] = key[191:160];
@@ -40,15 +40,15 @@ input  [255:0] key,         // Khóa gốc AES-256
         w[6] = key[63:32];
         w[7] = key[31:0];
 
-        // 2) Thuật toán mở rộng cho 52 word tiếp theo
+       
         for (i = 8; i < 60; i = i + 1) begin
             temp = w[i-1];
             
-            // Cứ mỗi 8 word thực hiện RotWord + SubWord + Rcon
+           
             if (i % 8 == 0) begin
                 temp = subWord(rotWord(temp)) ^ rcon(i/8);
             end 
-            // Bước bổ sung quan trọng của AES-256
+           
             else if (i % 8 == 4) begin
                 temp = subWord(temp);
             end
@@ -57,26 +57,26 @@ input  [255:0] key,         // Khóa gốc AES-256
         end
     end
 
-    // 3) Ghép nối 60 word thành chuỗi roundKeys 1920-bit
+   
     assign roundKeys = {
-        w[0],  w[1],  w[2],  w[3],    // Round key 0
-        w[4],  w[5],  w[6],  w[7],    // Round key 1
-        w[8],  w[9],  w[10], w[11],   // Round key 2
-        w[12], w[13], w[14], w[15],   // Round key 3
-        w[16], w[17], w[18], w[19],   // Round key 4
-        w[20], w[21], w[22], w[23],   // Round key 5
-        w[24], w[25], w[26], w[27],   // Round key 6
-        w[28], w[29], w[30], w[31],   // Round key 7
-        w[32], w[33], w[34], w[35],   // Round key 8
-        w[36], w[37], w[38], w[39],   // Round key 9
-        w[40], w[41], w[42], w[43],   // Round key 10
-        w[44], w[45], w[46], w[47],   // Round key 11
-        w[48], w[49], w[50], w[51],   // Round key 12
-        w[52], w[53], w[54], w[55],   // Round key 13
-        w[56], w[57], w[58], w[59]    // Round key 14
+        w[0],  w[1],  w[2],  w[3],    
+        w[4],  w[5],  w[6],  w[7],    
+        w[8],  w[9],  w[10], w[11],   
+        w[12], w[13], w[14], w[15],  
+        w[16], w[17], w[18], w[19],  
+        w[20], w[21], w[22], w[23],   
+        w[24], w[25], w[26], w[27],   
+        w[28], w[29], w[30], w[31],   
+        w[32], w[33], w[34], w[35],   
+        w[36], w[37], w[38], w[39],  
+        w[40], w[41], w[42], w[43],  
+        w[44], w[45], w[46], w[47],   
+        w[48], w[49], w[50], w[51], 
+        w[52], w[53], w[54], w[55],   
+        w[56], w[57], w[58], w[59]    
     };
 
-    // --- Các hàm chức năng ---
+   
     function [31:0] rotWord(input [31:0] x);
         begin
             rotWord = {x[23:0], x[31:24]}; 
@@ -102,7 +102,7 @@ input  [255:0] key,         // Khóa gốc AES-256
                 5: rcon = 32'h10000000; 
                 6: rcon = 32'h20000000; 
                 7: rcon = 32'h40000000;
-                // Với AES-256, chỉ cần đến Rcon(7) cho 60 words
+                
                 default: rcon = 32'h00000000;
             endcase
         end

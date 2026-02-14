@@ -29,7 +29,7 @@ input clk, rst,
 );
     reg [31:0] cb;
     always @(posedge clk or posedge rst) begin
-        if (rst) cb <= 32'd2; // Bắt đầu từ 2 cho encryption
+        if (rst) cb <= 32'd2;
         else if (load) cb <= 32'd2;
         else if (en) cb <= cb + 1;
     end

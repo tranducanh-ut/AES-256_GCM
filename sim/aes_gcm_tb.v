@@ -20,19 +20,27 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
+
 module aes_gcm_tb;
-   reg clk, rst;
+    reg clk, rst;
+    reg start;
     reg [255:0] key;
     reg [95:0] nonce;
     reg [127:0] pt1, pt2, pt3;
-    reg [223:0] aad;  // AAD is 224 bits (28 bytes)
+    reg [223:0] aad;
     wire [127:0] ct1, ct2, ct3;
     wire [127:0] tag;
+    wire done;
     
     // Test Vector 2.2.2 parameters
     initial begin
         $display("\n=== TEST VECTOR 2.2.2: 60-byte Packet Encryption ===");
         $display("From: MACsec GCM-AES Test Vectors, pages 10-12\n");
+        
+        // Initialize signals
+        clk = 0;
+        rst = 1;
+        start = 0;
         
         // Key (256-bit) - từ paper page 11
         key = 256'hE3C08A8F06C6E3AD95A70557B23F75483CE33021A9C72B7025666204C69C0B72;
@@ -51,15 +59,26 @@ module aes_gcm_tb;
         pt2 = 128'h1D1E1F202122232425262728292A2B2C;
         pt3 = 128'h2D2E2F303132333435363738393A0002;
         
-        clk = 0;
-        rst = 1;
+        // Reset sequence
         #10 rst = 0;
+        #10;
         
-        // Chờ kết quả
-        #200;
+        // Start encryption
+        $display("Starting encryption at time %0t", $time);
+        start = 1;
+        #10;
+        
+        // Wait for done signal
+        wait(done == 1);
+        $display("Encryption completed at time %0t", $time);
+        #10;
+        
+        // Deassert start
+        start = 0;
+        #20;
         
         // Kiểm tra kết quả
-        $display("=== RESULTS ===\n");
+        $display("\n=== RESULTS ===\n");
         
         $display("Ciphertext Block 1:");
         $display("  Got:      %h", ct1);
@@ -98,20 +117,28 @@ module aes_gcm_tb;
             ct2 == 128'ha592666c925fe2ef718eb4e308efeaa7 &&
             ct3 == 128'hc5273b394118860a5be2a97f56ab7836 &&
             tag == 128'h5ca597cdbb3edb8d1a1151ea0af7b436) begin
-            $display("=== ALL TESTS PASSED ✓✓✓ ===");
+            $display("=== ALL TESTS PASSED ✓ ===");
         end else begin
-            $display("=== SOME TESTS FAILED ✗✗✗ ===");
+            $display("=== SOME TESTS FAILED ✗ ===");
         end
         
+        #50;
         $finish;
     end
     
+    // Clock generation
     always #5 clk = ~clk;
+    
+    // Monitor done signal
+    always @(posedge done) begin
+        $display("[%0t] Done signal asserted", $time);
+    end
     
     // Instantiate DUT
     aes_gcm_top dut (
         .clk(clk),
         .rst(rst),
+        .start(start),
         .key(key),
         .nonce(nonce),
         .plaintext1(pt1),
@@ -121,6 +148,10 @@ module aes_gcm_tb;
         .ciphertext1(ct1),
         .ciphertext2(ct2),
         .ciphertext3(ct3),
-        .tag(tag)
+        .tag(tag),
+        .done(done)
     );
+    
+    // Optional: Waveform dump for debugging
+  
 endmodule
