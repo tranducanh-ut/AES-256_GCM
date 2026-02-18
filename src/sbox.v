@@ -26,7 +26,8 @@ input  [7:0] a,
 );
 
     // Khai báo mảng nhớ 256 phần tử (ROM)
-    reg [7:0] rom [0:255];
+    (* keep = "true" *)
+ (* rom_style = "block" *)    reg [7:0] rom [0:255];
 
     // Khởi tạo giá trị cho ROM
     // Yosys/OpenLane hỗ trợ tổng hợp khối initial này thành logic cố định

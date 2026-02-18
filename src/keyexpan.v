@@ -31,7 +31,7 @@ input  [255:0] key,
     // =========================================================================
     // INTERNAL S-BOX ROM (Để thay thế function sbox logic phức tạp)
     // =========================================================================
-    reg [7:0] sbox_rom [0:255];
+   (* rom_style = "block" *)  reg [7:0] sbox_rom [0:255];
     
     initial begin
         sbox_rom[8'h00] = 8'h63; sbox_rom[8'h01] = 8'h7c; sbox_rom[8'h02] = 8'h77; sbox_rom[8'h03] = 8'h7b;
