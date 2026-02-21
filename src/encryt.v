@@ -21,7 +21,7 @@
 
 
 module encryptRound(
-input [127:0] in,
+ input [127:0] in,
 output [127:0] out,
 input [127:0] key
     );

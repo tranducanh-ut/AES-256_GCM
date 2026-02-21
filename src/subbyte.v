@@ -80,5 +80,4 @@ module subbyte(
         sb8,  sb9,  sb10, sb11,
         sb12, sb13, sb14, sb15
     };
-
 endmodule

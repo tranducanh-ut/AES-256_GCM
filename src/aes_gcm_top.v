@@ -21,7 +21,7 @@
 
 
 module aes_gcm_top(
-    input  wire        clk,
+   input  wire        clk,
     input  wire        rst,
     input  wire        start,
     input  wire [255:0] key,
@@ -57,6 +57,15 @@ module aes_gcm_top(
     localparam DONE_STATE  = 4'd13;
 
     reg [3:0] state;
+     reg [127:0] h_key;
+    reg [127:0] tag_mask;
+    reg [127:0] ct1_temp, ct2_temp, ct3_temp;
+    reg [127:0] ghash_accumulator;
+
+    wire [127:0] aad_block1 = aad[223:96];
+    wire [127:0] aad_block2 = {aad[95:0], 32'h0};
+    wire [127:0] len_block  = {64'd224, 64'd384};
+
 
     // =====================================================
     // AES
@@ -104,15 +113,7 @@ module aes_gcm_top(
     // =====================================================
     // Internal registers
     // =====================================================
-    reg [127:0] h_key;
-    reg [127:0] tag_mask;
-    reg [127:0] ct1_temp, ct2_temp, ct3_temp;
-    reg [127:0] ghash_accumulator;
-
-    wire [127:0] aad_block1 = aad[223:96];
-    wire [127:0] aad_block2 = {aad[95:0], 32'h0};
-    wire [127:0] len_block  = {64'd224, 64'd384};
-
+   
     // =====================================================
     // MAIN FSM
     // =====================================================
